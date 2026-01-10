@@ -27,8 +27,10 @@ void AAuraPlayerController::BeginPlay()
 
 	// 添加增强输入上下文
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(AuraContext, 0);
+	if (IsValid(Subsystem))
+	{
+		Subsystem->AddMappingContext(AuraContext, 0);
+	}
 	
 	// 设置输入模式
 	bShowMouseCursor = true;
