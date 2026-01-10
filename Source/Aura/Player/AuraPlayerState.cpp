@@ -8,11 +8,13 @@
 
 AAuraPlayerState::AAuraPlayerState()
 {
+	// 初始化 Ability System Component
 	AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	// 设置复制模式
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
+	// 初始化 Attribute Set
 	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 	
 	// 设置更快的网络更新频率，因为挂载了 AbilitySystemComponent 和 AttributeSet
