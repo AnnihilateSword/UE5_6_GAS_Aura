@@ -47,6 +47,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
 	
+	/** 广播属性初始值 */
+	virtual void BroadcastInitialValues();
+	
+	/** 绑定依赖的回调 */
+	virtual void BindCallbacksToDependencies();
+	virtual void UnBindCallbacksToDependencies();
+	
 protected:
 	/** WidgetContoller 从下面这4个关键变量中获取数据 */
 	//~ Begin Model Data.

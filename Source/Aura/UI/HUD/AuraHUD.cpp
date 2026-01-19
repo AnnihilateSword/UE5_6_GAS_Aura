@@ -4,7 +4,7 @@
 #include "AuraHUD.h"
 
 #include "Aura/UI/Widget/AuraUserWidget.h"
-#include "WidgetController/OverlayWidgetController.h"
+#include "Aura/UI/WidgetController/OverlayWidgetController.h"
 
 void AAuraHUD::BeginPlay()
 {
@@ -17,6 +17,7 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
+		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController;
 }
@@ -33,6 +34,8 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	
 	OverlayWidget->SetWidgetController(WidgetController);
+	// 广播玩家初始属性值
+	WidgetController->BroadcastInitialValues();
 	OverlayWidget->AddToViewport();
 }
 
