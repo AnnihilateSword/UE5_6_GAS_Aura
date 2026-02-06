@@ -3,6 +3,8 @@
 
 #include "AuraAttributeSet.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -27,6 +29,77 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MaxMana, COND_None, REPNOTIFY_Always);
+}
+
+void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+	
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
+	}
+	if (Attribute == GetManaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxMana());
+	}
+}
+
+void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	
+	/**
+	 * 我们可以在这里收集大量信息，这些数据可以存储在一个结构里，
+	 * 然后更新的下面逻辑可以用一个单独函数封装起来，这样我们可以轻松访问这些数据，
+	 * 当实现更复杂的机制和战斗时，我们会使用它们
+	 */
+	FEffectProperties Props;
+	SetEffectProperties(Data, Props);
+}
+
+void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
+{
+	// Source = causer of the effect, Target = target of the effect (owner of this AS -> AttributeSet)
+
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid())
+	{
+		Props.SourceAvatarActor = Props.SourceASC->GetAvatarActor();
+		Props.SourcePlayerController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+		// 有时候我们的 ASC 挂在的 Actor 上可能不能获取到 PC，我们可以尝试通过 Pawn 直接获取
+		// 当 ASC 不直接挂在 Pawn 或 PlayerController 上，或初始化 / 网络时序不确定时
+		// AbilityActorInfo 里的 PlayerController 可能为空，此时应通过 AvatarActor → Pawn → Controller 兜底获取
+		// 举例：
+		// 1.ASC 挂在 PlayerState 上（非常经典的 GAS 架构）
+		// 2.AI/NPC（这里永远没有 PlayerController）
+		// 3.ASC 挂在非 Pawn 的 Actor 上（投射物、Buff Actor 等）
+		// 4.ASC 挂在 Character / Pawn 上，但 AbilityActorInfo 还没完全初始化（最常见）
+		if (Props.SourcePlayerController == nullptr && Props.SourceAvatarActor != nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
+			{
+				Props.SourcePlayerController = Cast<APlayerController>(Pawn->GetController());
+			}
+		}
+		if (IsValid(Props.SourcePlayerController))
+		{
+			Props.SourceCharacter = Props.SourcePlayerController->GetCharacter();
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.GetAvatarActor();
+		Props.TargetPlayerController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		if (IsValid(Props.TargetPlayerController))
+		{
+			Props.TargetCharacter = Props.TargetPlayerController->GetCharacter();
+		}
+		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
 }
 
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
