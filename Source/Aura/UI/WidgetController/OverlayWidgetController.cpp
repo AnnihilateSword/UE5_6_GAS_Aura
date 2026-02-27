@@ -3,6 +3,7 @@
 
 #include "OverlayWidgetController.h"
 
+#include "Aura/AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/AbilitySystem/AuraAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -27,6 +28,19 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	DH_MaxHealthAttributeValueChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &ThisClass::MaxHealthChanged);
 	DH_ManaAttributeValueChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetManaAttribute()).AddUObject(this, &ThisClass::ManaChanged);
 	DH_MaxManaAttributeValueChange = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::MaxManaChanged);
+	
+	// 当我们被应用了能力并改变各种标签时被通知到 WidgetController
+	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTag.AddLambda(
+		[](const FGameplayTagContainer& AssetTags)
+		{
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				const FString Msg = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
+				// GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Blue, Msg);
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
+			}
+		}
+	);
 }
 
 void UOverlayWidgetController::UnBindCallbacksToDependencies()

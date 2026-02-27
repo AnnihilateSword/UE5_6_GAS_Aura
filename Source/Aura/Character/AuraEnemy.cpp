@@ -23,8 +23,20 @@ void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 初始化 ASC
+	check(AbilitySystemComponent);
+
+	InitAbilityActorInfo();
+}
+
+void AAuraEnemy::InitAbilityActorInfo()
+{
+	Super::InitAbilityActorInfo();
+	
+	// Init Ability Actor Info
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	UAuraAbilitySystemComponent* AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	AuraAbilitySystemComponent->AbilityActorInfoSet();
 }
 
 void AAuraEnemy::HighlightActor()

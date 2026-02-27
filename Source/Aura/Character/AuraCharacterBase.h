@@ -30,7 +30,7 @@ public:
 	
 protected:
 	/** 初始化 Ability Actor Info ( GAS ) */
-	virtual void InitAbilityActorInfo();	
+	virtual void InitAbilityActorInfo();
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
