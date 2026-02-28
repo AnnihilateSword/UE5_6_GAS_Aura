@@ -17,8 +17,8 @@ void UAuraAbilitySystemComponent::RPCClient_EffectAssetTagBroadcast_Implementati
 void UAuraAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
-	// EffectSpec.GetAllAssetTags(TagContainer);
-	EffectSpec.GetAllGrantedTags(TagContainer);
+	EffectSpec.GetAllAssetTags(TagContainer);
+	// EffectSpec.GetAllGrantedTags(TagContainer);
 	
 	// for (const FGameplayTag& Tag : TagContainer)
 	// {
