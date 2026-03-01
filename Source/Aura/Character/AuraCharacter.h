@@ -24,4 +24,8 @@ protected:
 public:
 	/** 初始化 Ability Actor Info ( GAS ) */
 	virtual void InitAbilityActorInfo() override;
+	
+	//~ Begin ICombatInterface
+	virtual int32 GetPlayerLevel() override;
+	//~ End ICombatInterface
 };
