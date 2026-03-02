@@ -19,6 +19,12 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void AbilityActorInfoSet();
 	
+	/** 为角色添加能力 */ 
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+	
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+	
 public:
 	UFUNCTION(Client, Reliable)
 	void RPCClient_EffectAssetTagBroadcast(const FGameplayTagContainer& Container);

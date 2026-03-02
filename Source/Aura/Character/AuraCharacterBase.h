@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "AuraCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -40,6 +41,9 @@ protected:
 	/** 初始化默认属性 */
 	void InitializeDefaultAttributes() const;
 	
+	/** 为角色添加能力 */
+	void AddCharacterAbilities() const; 
+	
 protected:
 	// 角色手持的武器
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -64,4 +68,8 @@ protected:
 	// 该 GE 用来初始化 Vital 属性
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributesEffect;
+	
+private:
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };
