@@ -32,6 +32,9 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 private:
+	void AutoRun();
+	
+private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
 	
@@ -77,4 +80,6 @@ private:
 	// 样条曲线允许我们根据一个世界位置（FVector）生成一条平滑的曲线
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> ClickMoveSpline;
+	
+	FHitResult CusorResult;
 };
