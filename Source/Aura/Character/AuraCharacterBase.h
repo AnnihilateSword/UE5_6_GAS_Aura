@@ -29,6 +29,10 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	// ~End IAbilitySystemInterface
 	
+	// ~Begin ICombatInterface
+	virtual FVector GetCombatSocketLocation() override;
+	// ~End ICombatInterface
+	
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
 protected:
@@ -72,4 +76,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
 };

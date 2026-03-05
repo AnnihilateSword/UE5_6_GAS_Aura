@@ -81,5 +81,5 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> ClickMoveSpline;
 	
-	FHitResult CusorResult;
+	FHitResult CursorResult;
 };
