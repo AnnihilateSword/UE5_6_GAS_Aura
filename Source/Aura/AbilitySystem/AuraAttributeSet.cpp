@@ -93,6 +93,23 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.0f, GetMaxMana()));
 	}
+	
+	// 伤害元属性用来计算实际伤害值应用到其他属性（例如生命值），然后重置或归零
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		// 用局部变量缓存，随后立即重置掉 伤害元属性
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.0f);
+		
+		if (LocalIncomingDamage > 0.0f)
+		{
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
+			
+			// 是否是致命一击
+			const bool bFatal = NewHealth <= 0.0f;
+		}
+	}
 }
 
 void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
