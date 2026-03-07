@@ -43,7 +43,7 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	
 	/** 初始化默认属性 */
-	void InitializeDefaultAttributes() const;
+	virtual void InitializeDefaultAttributes() const;
 	
 	/** 为角色添加能力 */
 	void AddCharacterAbilities() const; 

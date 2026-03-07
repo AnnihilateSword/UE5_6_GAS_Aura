@@ -5,6 +5,7 @@
 
 #include "Aura/Aura.h"
 #include "Aura/AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Aura/AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Aura/AbilitySystem/AuraAttributeSet.h"
 #include "Aura/UI/Widget/AuraUserWidget.h"
 #include "Components/WidgetComponent.h"
@@ -74,6 +75,12 @@ void AAuraEnemy::InitAbilityActorInfo()
 	
 	// 初始化属性
 	InitializeDefaultAttributes();
+}
+
+void AAuraEnemy::InitializeDefaultAttributes() const
+{
+	// 根据职业，等级初始化默认属性值
+	UAuraAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
 
 void AAuraEnemy::HighlightActor()

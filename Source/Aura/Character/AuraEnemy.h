@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AuraCharacterBase.h"
+#include "Aura/Data/CharacterClassInfo.h"
 #include "Aura/Interaction/EnemyInterface.h"
 #include "Aura/UI/WidgetController/OverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
@@ -25,6 +26,7 @@ protected:
 	
 	/** 初始化 Ability Actor Info */
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitializeDefaultAttributes() const override;
 	
 public:
 	// ~Begin IEnemyInterface
@@ -44,9 +46,14 @@ public:
 	FOnAttributeChangedSignature OnMaxHealthChanged;
 	
 protected:
+	/** 角色等级 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")	
 	int32 Level = 1;
 
+	/** 角色职业 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")	
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
 };
