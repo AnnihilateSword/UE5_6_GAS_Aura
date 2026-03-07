@@ -61,7 +61,9 @@ void AAuraPlayerController::SetupInputComponent()
 	
 	if (UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent))
 	{
-		AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+		AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+		AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ThisClass::ShiftPressed);
+		AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &ThisClass::ShiftReleased);
 		
 		AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 	}
@@ -121,7 +123,7 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	// 如果是鼠标左键
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		// 检查我们的 m_ThisActor 是否是一个有效的 Actor
+		// 检查我们的 ThisActor 是否是一个有效的 Actor
 		bTargeting = ThisActor ? true : false;
 		bAutoRunning = false;
 	}
@@ -129,43 +131,40 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	// 1. 如果不是鼠标左键，我们激活能力
+	// 1. 如果不是鼠标左键，调用 AbilityInputTagReleased 不激活能力
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
 		{
-			GetASC()->AbilityInputTagHeld(InputTag);
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 		return;
 	}
 
-	// 2. 我们按下了鼠标左键，并且鼠标在目标上盘旋，我们激活能力
-	if (bTargeting)
+	// 是鼠标左键，无论有没有目标我们都调用 AbilityInputTagReleased，不激活能力
+	if (GetASC())
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		GetASC()->AbilityInputTagReleased(InputTag);
 	}
-	// 3. 如果按下了鼠标左键，但是没有目标，我们关心我们的移动行为
-	else
+    
+	// 什么时候自动寻路？没有目标并且没有按下 Shift，因为按下 Shift 可能是发射法术
+	if (!bTargeting && !bShiftKeyDown)
 	{
-		if (FollowTime <= ShortPressThreshold)
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
-			APawn* ControlledPawn = GetPawn();
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 			{
 				ClickMoveSpline->ClearSplinePoints();
 				for (const FVector& PointLoc : NavPath->PathPoints)
 				{
 					ClickMoveSpline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					DrawDebugSphere(GetWorld(), PointLoc, 8.0f, 8, FColor::Red, false, 5.0f);
 				}
 				// if (NavPath->PathPoints.Num() > 0)
 				// {
-					// UE5.6 似乎没有这个问题：当我们点击一个不在我们 Nav Mesh Bounds Volume 区域的地方时，角色会跑过去但永远不会靠近这个地方。
-					// 把我们生成的路径中的最后一个点设置为我们缓存的目的地
-					// CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+				// UE5.6 似乎没有这个问题：当我们点击一个不在我们 Nav Mesh Bounds Volume 区域的地方时，角色会跑过去但永远不会靠近这个地方。
+				// 把我们生成的路径中的最后一个点设置为我们缓存的目的地
+				// CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
 				// }
 				bAutoRunning = true;
 			}
@@ -188,7 +187,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	}
 
 	// 2. 我们按下了鼠标左键，并且鼠标在目标上盘旋，我们激活能力
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 		{

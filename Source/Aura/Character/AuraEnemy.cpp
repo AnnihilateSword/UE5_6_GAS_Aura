@@ -37,6 +37,9 @@ void AAuraEnemy::InitAbilityActorInfo()
 
 	UAuraAbilitySystemComponent* AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 	AuraAbilitySystemComponent->AbilityActorInfoSet();
+	
+	// 初始化属性
+	InitializeDefaultAttributes();
 }
 
 void AAuraEnemy::HighlightActor()
