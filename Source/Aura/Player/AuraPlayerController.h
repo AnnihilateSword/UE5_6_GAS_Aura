@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextComponent;
 class USplineComponent;
 class UAuraAbilitySystemComponent;
 struct FGameplayTag;
@@ -33,6 +34,10 @@ protected:
 	
 private:
 	void AutoRun();
+	
+public:
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -89,4 +94,8 @@ private:
 	TObjectPtr<USplineComponent> ClickMoveSpline;
 	
 	FHitResult CursorResult;
+	
+	/** 伤害飘字组件 */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };
