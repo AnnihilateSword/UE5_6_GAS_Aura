@@ -18,4 +18,7 @@ public:
 	// 如果这是一个启动能力（角色在开始就被赋予的能力），那么使用这个标签
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	FGameplayTag StartupGameplayTag;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	FScalableFloat Damage;
 };
