@@ -31,6 +31,7 @@ public:
 	
 	// ~Begin ICombatInterface
 	virtual FVector GetCombatSocketLocation() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	// ~End ICombatInterface
 	
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
@@ -79,4 +80,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

@@ -4,11 +4,13 @@
 #include "AuraEnemy.h"
 
 #include "Aura/Aura.h"
+#include "Aura/AuraGameplayTags.h"
 #include "Aura/AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Aura/AbilitySystem/AuraAttributeSet.h"
 #include "Aura/UI/Widget/AuraUserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAuraEnemy::AAuraEnemy()
 {
@@ -29,8 +31,13 @@ void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 初始化移动速度
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	
 	check(AbilitySystemComponent);
 	InitAbilityActorInfo();
+	// 初始化所有职业共享的 GA
+	UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 	// 设置 WidgetController
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -52,6 +59,10 @@ void AAuraEnemy::BeginPlay()
 			{
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
+		);
+		// 监听 Effects_HitReact 标签添加或移除时触发的回调
+		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this, &ThisClass::HitReactTagChanged
 		);
 		
 		// 在客户端，广播会在属性被复制时主动触发
@@ -100,4 +111,14 @@ void AAuraEnemy::UnHighlightActor()
 int32 AAuraEnemy::GetPlayerLevel()
 {
 	return Level;
+}
+
+void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	/**
+	 * 我们可以检查计数是否为 0，是否大于 0，是否第一次添加等等
+	 */
+	bHitReacting = NewCount > 0;
+	// 如果在受击，不能移动
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.0f : BaseWalkSpeed;
 }

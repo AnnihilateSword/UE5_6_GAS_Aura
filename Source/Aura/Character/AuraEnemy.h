@@ -38,6 +38,8 @@ public:
 	virtual int32 GetPlayerLevel() override;	
 	//~ End ICombatInterface
 	
+	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
@@ -56,4 +58,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+	
+	/** 是否受击中 */
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bHitReacting = false;
+	
+	/** 基础移动速度 */
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 250.0f;
 };
