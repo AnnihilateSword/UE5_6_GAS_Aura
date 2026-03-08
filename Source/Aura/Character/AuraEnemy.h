@@ -36,6 +36,7 @@ public:
 	
 	//~ Begin ICombatInterface
 	virtual int32 GetPlayerLevel() override;	
+	virtual void Die() override;
 	//~ End ICombatInterface
 	
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
@@ -66,4 +67,8 @@ protected:
 	/** 基础移动速度 */
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 250.0f;
+	
+	/** 死亡后的生命周期 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float LifeSpan = 5.0f;
 };

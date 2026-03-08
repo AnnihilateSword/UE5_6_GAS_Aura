@@ -32,7 +32,11 @@ public:
 	// ~Begin ICombatInterface
 	virtual FVector GetCombatSocketLocation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual void Die() override;
 	// ~End ICombatInterface
+	
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 	
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
