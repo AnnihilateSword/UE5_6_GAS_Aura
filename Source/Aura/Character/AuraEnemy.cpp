@@ -36,8 +36,11 @@ void AAuraEnemy::BeginPlay()
 	
 	check(AbilitySystemComponent);
 	InitAbilityActorInfo();
-	// 初始化所有职业共享的 GA
-	UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	if (HasAuthority())
+	{
+		// 初始化所有职业共享的 GA
+		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	}
 
 	// 设置 WidgetController
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -84,8 +87,11 @@ void AAuraEnemy::InitAbilityActorInfo()
 	UAuraAbilitySystemComponent* AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 	AuraAbilitySystemComponent->AbilityActorInfoSet();
 	
-	// 初始化属性
-	InitializeDefaultAttributes();
+	if (HasAuthority())
+	{
+		// 初始化属性
+		InitializeDefaultAttributes();
+	}
 }
 
 void AAuraEnemy::InitializeDefaultAttributes() const
