@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemLibrary.h"
 #include "AuraAttributeSet.h"
+#include "Aura/AuraAbilityTypes.h"
 #include "Aura/AuraGameplayTags.h"
 #include "Aura/Interaction/CombatInterface.h"
 
@@ -68,7 +69,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Get Damage Set by Caller Magnitude
 	// 这个是在 GA 中设置的（例如火球 GA: AuraProjectileSpell）
- 	float Damage = Spec.GetSetByCallerMagnitude(FAuraGameplayTags::Get().Damage);
+	float Damage = 0.f;
+	for (FGameplayTag DamageTypeTag : FAuraGameplayTags::Get().DamageTypes)
+	{
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag);
+		Damage += DamageTypeValue;
+	}
 	
 	// 捕获目标的 BlockChance 值，用来做格挡几率
 	float TargetBlockChance = 0.0f;
@@ -76,6 +82,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.0f);
 	
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
+	
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 	
 	// 如果格挡成功，伤害减半
 	Damage = bBlocked ? (Damage *= 0.5f) : Damage;
@@ -121,7 +131,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// “暴击命中抗性” 会将 “暴击命中几率” 降低一定比例
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResistanceCoefficient;
 	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;
-
+	
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHit);
+	
 	// 双倍伤害，若造成暴击则额外加成
 	Damage = bCriticalHit ? 2.f * Damage + SourceCriticalHitDamage : Damage;
 	//~End 暴击伤害处理
