@@ -40,17 +40,20 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass, bool bRemoveAfterApply = true);
+	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 	
 	UFUNCTION(BlueprintCallable)
-	void OnOverlap(AActor* TargetActor, bool bRemoveAfterApply);
+	void OnOverlap(AActor* TargetActor);
 
 	UFUNCTION(BlueprintCallable)
-	void OnEndOverlap(AActor* TargetActor, bool bRemoveAfterApply);
+	void OnEndOverlap(AActor* TargetActor);
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects", meta = (AllowPrivateAccess = "true"))
-	bool DestroyOnEffectRemoval = false;
+	bool bDestroyOnEffectApplication = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects", meta = (AllowPrivateAccess = "true"))
+	bool bApplyEffectToEnemies = false;
 	
 	/** 立即生效 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects", meta = (AllowPrivateAccess = "true"))

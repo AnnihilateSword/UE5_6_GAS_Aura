@@ -19,9 +19,11 @@ void AAuraEffectActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass, bool bRemoveAfterApply)
+void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
 	if (!HasAuthority()) return;
+	
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectToEnemies) return;
 	
 	/**
 	 * 1. 从指定 Actor 获取 ASC
@@ -45,47 +47,52 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
 	
-	if (bRemoveAfterApply)
+	// 如果不是无限效果，应用后立即销毁
+	if (!bIsInfinite)
 	{
 		Destroy();
 	}
 }
 
-void AAuraEffectActor::OnOverlap(AActor* TargetActor, bool bRemoveAfterApply)
+void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 {
 	if (!HasAuthority()) return;
+	
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectToEnemies) return;
 	
 	// 重叠时应用效果
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
 	}
 	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
 	}
 	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
 	}
 }
 
-void AAuraEffectActor::OnEndOverlap(AActor* TargetActor, bool bRemoveAfterApply)
+void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
 	if (!HasAuthority()) return;
+
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectToEnemies) return;
 	
 	// 离开重叠时应用效果
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
 	}
 	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
 	}
 	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass, bRemoveAfterApply);
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
 	}
 	
 	// 离开重叠时移除效果
