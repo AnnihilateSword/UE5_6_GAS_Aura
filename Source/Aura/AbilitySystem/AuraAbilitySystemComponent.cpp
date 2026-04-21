@@ -12,7 +12,6 @@ void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 	
 	// 其实 GE 只在 服务端应用
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::EffectApplied);
-	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::RPCClient_EffectApplied);
 }
 
 void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
@@ -62,16 +61,6 @@ void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 			AbilitySpecInputReleased(AbilitySpec);
 		}
 	}
-}
-
-void UAuraAbilitySystemComponent::RPCClient_EffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
-{
-	FGameplayTagContainer TagContainer;
-	EffectSpec.GetAllAssetTags(TagContainer);
-	// EffectSpec.GetAllGrantedTags(TagContainer);
-
-	// [Client] 将 TagContainer 广播
-	EffectAssetTag.Broadcast(TagContainer);
 }
 
 void UAuraAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)

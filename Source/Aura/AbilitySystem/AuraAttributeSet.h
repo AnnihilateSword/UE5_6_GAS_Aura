@@ -34,7 +34,7 @@ struct FEffectProperties
 	AActor* SourceAvatarActor = nullptr;
 
 	UPROPERTY()
-	APlayerController* SourcePlayerController = nullptr;
+	AController* SourceController = nullptr;
 
 	UPROPERTY()
 	ACharacter* SourceCharacter = nullptr;
@@ -47,7 +47,7 @@ struct FEffectProperties
 	AActor* TargetAvatarActor = nullptr;
 
 	UPROPERTY()
-	APlayerController* TargetPlayerController = nullptr;
+	AController* TargetController = nullptr;
 
 	UPROPERTY()
 	ACharacter* TargetCharacter = nullptr;

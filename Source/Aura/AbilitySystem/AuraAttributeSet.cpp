@@ -157,7 +157,7 @@ void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallb
 	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid())
 	{
 		Props.SourceAvatarActor = Props.SourceASC->GetAvatarActor();
-		Props.SourcePlayerController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+		Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
 		// 有时候我们的 ASC 挂在的 Actor 上可能不能获取到 PC，我们可以尝试通过 Pawn 直接获取
 		// 当 ASC 不直接挂在 Pawn 或 PlayerController 上，或初始化 / 网络时序不确定时
 		// AbilityActorInfo 里的 PlayerController 可能为空，此时应通过 AvatarActor → Pawn → Controller 兜底获取
@@ -166,23 +166,23 @@ void UAuraAttributeSet::SetEffectProperties(const struct FGameplayEffectModCallb
 		// 2.AI/NPC（这里永远没有 PlayerController）
 		// 3.ASC 挂在非 Pawn 的 Actor 上（投射物、Buff Actor 等）
 		// 4.ASC 挂在 Character / Pawn 上，但 AbilityActorInfo 还没完全初始化（最常见）
-		if (Props.SourcePlayerController == nullptr && Props.SourceAvatarActor != nullptr)
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
 		{
 			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
 			{
-				Props.SourcePlayerController = Cast<APlayerController>(Pawn->GetController());
+				Props.SourceController = Pawn->GetController();
 			}
 		}
-		if (IsValid(Props.SourcePlayerController))
+		if (IsValid(Props.SourceController))
 		{
-			Props.SourceCharacter = Props.SourcePlayerController->GetCharacter();
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
 
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		Props.TargetAvatarActor = Data.Target.GetAvatarActor();
-		Props.TargetPlayerController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
@@ -194,6 +194,11 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceCharacter->Controller))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
+			return;
+		}
+		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.TargetCharacter->Controller))
 		{
 			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}

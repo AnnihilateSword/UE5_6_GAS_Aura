@@ -36,6 +36,7 @@ private:
 	void AutoRun();
 	
 public:
+	/** 该函数仅在调用该函数的对象所属的客户端上执行 */
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 	

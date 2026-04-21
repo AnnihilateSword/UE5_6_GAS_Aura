@@ -35,6 +35,8 @@ public:
 	// ~Begin IEnemyInterface
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
 	// ~End IEnemyInterface
 	
 	//~ Begin ICombatInterface
@@ -68,7 +70,7 @@ protected:
 	bool bHitReacting = false;
 	
 	/** 基础移动速度 */
-	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 250.0f;
 	
 	/** 死亡后的生命周期 */
@@ -81,4 +83,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AAuraAIController> AuraAIController;
+	
+	// 战斗目标
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
 };
