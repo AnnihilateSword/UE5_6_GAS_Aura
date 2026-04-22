@@ -76,7 +76,7 @@ protected:
 	
 protected:
 	// 角色手持的武器
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
 	// 这里在基类存储一份 AbilitySystemComponent 和 AttributeSet 但是不在基类中构造
