@@ -36,6 +36,7 @@ public:
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	// ~End ICombatInterface
 	
 	UFUNCTION(NetMulticast, Reliable)
@@ -43,6 +44,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontages;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	UNiagaraSystem* BloodEffect;
 	
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	
