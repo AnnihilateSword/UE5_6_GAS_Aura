@@ -47,7 +47,10 @@ void AAuraProjectile::BeginPlay()
 	if (IsNetMode(NM_Client))
 	{
 		LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
-		LoopingSoundComponent->bStopWhenOwnerDestroyed = true;
+		if (IsValid(LoopingSoundComponent))
+		{
+			LoopingSoundComponent->bStopWhenOwnerDestroyed = true;
+		}
 	}
 }
 
@@ -70,7 +73,7 @@ void AAuraProjectile::Destroyed()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
 	{
 		return;
 	}
